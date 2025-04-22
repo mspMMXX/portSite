@@ -4,6 +4,5 @@ let myText = "";
 
 button.addEventListener("click", () => {
     myText = document.getElementById("input-one").ariaValueMax;
-    lable.value = myText; 
-    sdfsdf 
+    lable.value = myText;
 })
