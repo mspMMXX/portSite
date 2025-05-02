@@ -1,5 +1,5 @@
 # Kleines fertiges Node.js-System
-FROM node:18-alpine
+FROM node:18-alpine 
 
 # Installation - einfaches Webserver-Programm (name: http-server)
 RUN npm install -g http-server
