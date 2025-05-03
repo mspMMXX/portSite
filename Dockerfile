@@ -7,6 +7,9 @@ RUN npm install -g http-server
 # Container
 WORKDIR /app
 
+# Port
+EXPOSE 80
+
 # Kopieren aller Daten vom Projekt in Container
 COPY . .
 
