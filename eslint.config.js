@@ -15,8 +15,8 @@ export default defineConfig([
     extends: ["js/recommended"],
     languageOptions: {
       parserOptions: { ecmaVersion: "latest", sourceType: "module" },
-      globals: globals.browser
-    }
+      globals: globals.browser,
+    },
   },
   // 2) JSX/React
   {
@@ -25,22 +25,22 @@ export default defineConfig([
     extends: [reactConfigs.flat.recommended],
     languageOptions: {
       parserOptions: { ecmaVersion: "latest", sourceType: "module" },
-      globals: { ...globals.browser, ...globals.node }
+      globals: { ...globals.browser, ...globals.node },
     },
     settings: {
-      react: { version: "detect" }
-    }
+      react: { version: "detect" },
+    },
   },
   // 3) Jest-Tests
   {
     files: [
       "**/*.test.{js,mjs,cjs}",
       "**/*.spec.{js,mjs,cjs}",
-      "__tests__/**/*.{js,mjs,cjs}"
+      "__tests__/**/*.{js,mjs,cjs}",
     ],
     languageOptions: {
       parserOptions: { ecmaVersion: "latest", sourceType: "module" },
-      globals: globals.jest
-    }
-  }
+      globals: globals.jest,
+    },
+  },
 ]);
