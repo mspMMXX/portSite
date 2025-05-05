@@ -77,9 +77,10 @@ jobs:
       - name: Deploy to Staging
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          IMAGE_TAG:        ${{ github.sha }}
+          IMAGE_NAME:         portsite
+          IMAGE_TAG:          ${{ github.sha }}
         run: |
-          echo "→ pulling image $DOCKERHUB_USERNAME/portsite:$IMAGE_TAG"
+          echo "→ pulling image $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
           ./scripts/deploy-staging.sh
 
   deploy-prod:
@@ -106,9 +107,10 @@ jobs:
       - name: Deploy to Production
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          IMAGE_TAG:          ${{ github.ref_name }}
+          IMAGE_NAME:         portsite
+          IMAGE_TAG:          ${{ github.ref_name }}  # z.B. "v1.2.3"
         run: |
-          echo "→ pulling image $DOCKERHUB_USERNAME/portsite:$IMAGE_TAG"
+          echo "→ pulling image $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
           ./scripts/deploy-prod.sh
 
   pages:
