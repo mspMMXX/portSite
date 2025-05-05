@@ -1,0 +1,16 @@
+node_modules/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.vscode/
+
+dist/
+build/
+
+*.tar
+Dockerfile.*
+
+.DS_Store
+Thumbs.db

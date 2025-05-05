@@ -1,41 +1,41 @@
 html {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .main-menu {
-    list-style: none;
-    padding: 0px;
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
+  list-style: none;
+  padding: 0px;
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
 }
 
 .main-menu li {
-    display: inline-block;
-    margin-right: 30px;
+  display: inline-block;
+  margin-right: 30px;
 }
 
 .main-menu li a {
-    text-decoration: none;
-    font-family: "JetBrains Mono";
-    font-weight: 200;
-    font-size: 0.9rem;
-    color: black;
+  text-decoration: none;
+  font-family: "JetBrains Mono";
+  font-weight: 200;
+  font-size: 0.9rem;
+  color: black;
 }
 
 .main-menu li a:hover {
-    color: rgb(244, 53, 145);
+  color: rgb(244, 53, 145);
 }
 
 .main-menu li a.active {
-    font-weight: 400;
-    color: rgb(244, 53, 145);
+  font-weight: 400;
+  color: rgb(244, 53, 145);
 }
 
 p {
-    margin-top: 80px;
-    text-align: center;
-    font-family: "JetBrains Mono";
-    font-size: 0.8rem;
-    font-weight: 100;
+  margin-top: 80px;
+  text-align: center;
+  font-family: "JetBrains Mono";
+  font-size: 0.8rem;
+  font-weight: 100;
 }
