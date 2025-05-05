@@ -2,11 +2,11 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   release:
-    types: [ published ]
+    types: [published]
 
 jobs:
   build-and-push:
@@ -75,7 +75,7 @@ jobs:
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_NAME: portsite
-          IMAGE_TAG:    ${{ github.sha }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           echo "→ pulling image $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
           ./scripts/deploy-staging.sh
@@ -102,7 +102,7 @@ jobs:
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_NAME: portsite
-          IMAGE_TAG:    ${{ github.ref_name }}   # z.B. "v1.2.3"
+          IMAGE_TAG: ${{ github.ref_name }} # z.B. "v1.2.3"
         run: |
           echo "→ pulling image $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
           ./scripts/deploy-prod.sh
