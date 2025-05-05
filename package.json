@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint . --ext .js,.mjs,.cjs,.jsx",
+    "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "jest --verbose",
     "test:coverage": "jest --coverage",

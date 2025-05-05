@@ -1,8 +1,11 @@
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-docker pull $DOCKERHUB_USERNAME/portsite:$GITHUB_SHA
+IMAGE="$DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+
+echo "Deploying $IMAGE to Staging…"
+docker pull "$IMAGE"
 docker run -d \
   --name portsite-staging \
-  -e NODE_ENV=staging \
   -p 80:80 \
-  $DOCKERHUB_USERNAME/portsite:$GITHUB_SHA
+  "$IMAGE"
