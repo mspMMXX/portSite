@@ -12,7 +12,6 @@ jobs:
   build-and-push:
     name: Build, Test & Push Docker Image
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -46,20 +45,19 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }}
-          docker build -t "$IMAGE" .
+          docker build \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }} \
+            .
 
       - name: Push Docker Image
         run: |
-          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }}
-          docker push "$IMAGE"
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }}
 
   deploy-staging:
     name: Deploy to Staging
     needs: build-and-push
     runs-on: ubuntu-latest
     environment: staging
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -71,17 +69,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      - name: Make deploy script executable
+        run: chmod +x scripts/deploy-staging.sh
+
       - name: Deploy to Staging
+        # hier setzen wir nur die drei Variablen, das Skript bildet selbst den vollständigen Namen
         env:
-          IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }}
-        run: |
-          echo "→ pulling image $IMAGE"
-          docker pull "$IMAGE"
-          docker rm -f portsite-staging || true
-          docker run -d \
-            --name portsite-staging \
-            -p 80:80 \
-            "$IMAGE"
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_NAME:         portsite
+          IMAGE_TAG:          ${{ github.sha }}
+        run: ./scripts/deploy-staging.sh
 
   deploy-prod:
     name: Deploy to Production
@@ -89,7 +86,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     if: startsWith(github.ref, 'refs/tags/v')
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -101,23 +97,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      - name: Make deploy script executable
+        run: chmod +x scripts/deploy-prod.sh
+
       - name: Deploy to Production
         env:
-          IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.ref_name }}
-        run: |
-          echo "→ pulling image $IMAGE"
-          docker pull "$IMAGE"
-          docker rm -f portsite-prod || true
-          docker run -d \
-            --name portsite-prod \
-            -p 80:80 \
-            "$IMAGE"
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_NAME:         portsite
+          IMAGE_TAG:          ${{ github.ref_name }}  # z.B. "v1.2.3"
+        run: ./scripts/deploy-prod.sh
 
   pages:
     name: Deploy to GitHub Pages
     needs: build-and-push
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
