@@ -2,33 +2,13 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
   release:
-    types: [published]
+    types: [ published ]
 
 jobs:
-  deploy-staging:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    environment: staging
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Deploy to Staging
-        run: ./scripts/deploy-staging.sh
-
-  deploy-prod:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    environment: production
-    if: startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - uses: actions/checkout@v3
-      - name: Deploy to Production
-        run: ./scripts/deploy-prod.sh
-
   build-and-push:
     name: Build, Test & Push Docker Image
     runs-on: ubuntu-latest
@@ -74,7 +54,60 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }}
 
-  deploy:
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Deploy to Staging
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_NAME: portsite
+          IMAGE_TAG:    ${{ github.sha }}
+        run: |
+          echo "→ pulling image $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+          ./scripts/deploy-staging.sh
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Deploy to Production
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_NAME: portsite
+          IMAGE_TAG:    ${{ github.ref_name }}   # z.B. "v1.2.3"
+        run: |
+          echo "→ pulling image $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+          ./scripts/deploy-prod.sh
+
+  pages:
     name: Deploy to GitHub Pages
     needs: build-and-push
     runs-on: ubuntu-latest
@@ -87,4 +120,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          publish_dir: .
