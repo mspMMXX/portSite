@@ -46,13 +46,13 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }} \
-            .
+          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }}
+          docker build -t "$IMAGE" .
 
       - name: Push Docker Image
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }}
+          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }}
+          docker push "$IMAGE"
 
   deploy-staging:
     name: Deploy to Staging
@@ -71,17 +71,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Make deploy script executable
-        run: chmod +x scripts/deploy-staging.sh
-
       - name: Deploy to Staging
         env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          IMAGE_NAME:         portsite
-          IMAGE_TAG:          ${{ github.sha }}
+          IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.sha }}
         run: |
-          echo "→ pulling image $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
-          ./scripts/deploy-staging.sh
+          echo "→ pulling image $IMAGE"
+          docker pull "$IMAGE"
+          docker rm -f portsite-staging || true
+          docker run -d \
+            --name portsite-staging \
+            -p 80:80 \
+            "$IMAGE"
 
   deploy-prod:
     name: Deploy to Production
@@ -101,17 +101,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Make deploy script executable
-        run: chmod +x scripts/deploy-prod.sh
-
       - name: Deploy to Production
         env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          IMAGE_NAME:         portsite
-          IMAGE_TAG:          ${{ github.ref_name }}  # z.B. "v1.2.3"
+          IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/portsite:${{ github.ref_name }}
         run: |
-          echo "→ pulling image $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
-          ./scripts/deploy-prod.sh
+          echo "→ pulling image $IMAGE"
+          docker pull "$IMAGE"
+          docker rm -f portsite-prod || true
+          docker run -d \
+            --name portsite-prod \
+            -p 80:80 \
+            "$IMAGE"
 
   pages:
     name: Deploy to GitHub Pages
