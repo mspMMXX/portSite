@@ -2,11 +2,11 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
   release:
-    types: [published]
+    types: [ published ]
 
 jobs:
   build-and-push:
@@ -71,13 +71,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      - name: Make deploy script executable
+        run: chmod +x scripts/deploy-staging.sh
+
       - name: Deploy to Staging
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          IMAGE_NAME: portsite
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG:        ${{ github.sha }}
         run: |
-          echo "→ pulling image $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+          echo "→ pulling image $DOCKERHUB_USERNAME/portsite:$IMAGE_TAG"
           ./scripts/deploy-staging.sh
 
   deploy-prod:
@@ -98,13 +100,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      - name: Make deploy script executable
+        run: chmod +x scripts/deploy-prod.sh
+
       - name: Deploy to Production
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          IMAGE_NAME: portsite
-          IMAGE_TAG: ${{ github.ref_name }} # z.B. "v1.2.3"
+          IMAGE_TAG:          ${{ github.ref_name }}
         run: |
-          echo "→ pulling image $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+          echo "→ pulling image $DOCKERHUB_USERNAME/portsite:$IMAGE_TAG"
           ./scripts/deploy-prod.sh
 
   pages:
