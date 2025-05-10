@@ -25,13 +25,25 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        run: npm run lint
+        run: |
+          echo "::group::Running ESLint"
+          npm run lint
+          echo "::endgroup::"
+        continue-on-error: false
 
       - name: Check formatting
-        run: npm run format:check
+        run: |
+          echo "::group::Checking formatting"
+          npm run format:check
+          echo "::endgroup::"
+        continue-on-error: false
 
       - name: Run Tests
-        run: npm run test
+        run: |
+          echo "::group::Running Tests"
+          npm run test
+          echo "::endgroup::"
+        continue-on-error: false
 
       - name: Build assets
         run: npm run build
@@ -73,7 +85,6 @@ jobs:
         run: chmod +x scripts/deploy-staging.sh
 
       - name: Deploy to Staging
-        # hier setzen wir nur die drei Variablen, das Skript bildet selbst den vollständigen Namen
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_NAME:         portsite
@@ -104,7 +115,7 @@ jobs:
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_NAME:         portsite
-          IMAGE_TAG:          ${{ github.ref_name }}  # z.B. "v1.2.3"
+          IMAGE_TAG:          ${{ github.ref_name }}
         run: ./scripts/deploy-prod.sh
 
   pages:
